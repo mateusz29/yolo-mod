@@ -354,10 +354,27 @@ The first ONNX inference usually has a higher initialization cost due to session
 Subsequent inferences are significantly faster, as the model and required resources are already loaded in memory.  
 In PyTorch (.pt), this initial overhead is often smaller.
 
-## Citation
-
-If you use YOLO-MOD in your research, please cite the corresponding SoftwareX article.
-
 ### Reference
 
 [1] Sun, X., Wang, P., Yan, Z., Xu, F., Wang, R., Diao, W., ... & Fu, K. (2022). FAIR1M: A benchmark dataset for fine-grained object recognition in high-resolution remote sensing imagery. *ISPRS Journal of Photogrammetry and Remote Sensing*, 184, 116–130.
+
+## Citation
+
+If you use YOLO-MOD in your research, please cite the corresponding SoftwareX article:
+
+### Plain text citation
+
+Ciecholewski, M., Strzelecki, M., & Farelnik, M. (2026). YOLO-MOD: YOLO-based multi-category object detection plugin for maritime, aviation, and infrastructure objects in optical remote sensing images in QGIS. SoftwareX, 34, 102721. https://doi.org/10.1016/j.softx.2026.102721
+
+### BibTeX
+
+```bibtex
+@article{Ciecholewski2026YOLOMOD,
+  title   = {YOLO-MOD: YOLO-based multi-category object detection plugin for maritime, aviation, and infrastructure objects in optical remote sensing images in QGIS},
+  author  = {Ciecholewski, Marcin and Strzelecki, Mateusz and Farelnik, Miraslau},
+  journal = {SoftwareX},
+  volume  = {34},
+  pages   = {102721},
+  year    = {2026},
+  doi     = {10.1016/j.softx.2026.102721}
+}
