@@ -354,7 +354,7 @@ The first ONNX inference usually has a higher initialization cost due to session
 Subsequent inferences are significantly faster, as the model and required resources are already loaded in memory.  
 In PyTorch (.pt), this initial overhead is often smaller.
 
-### Reference
+## References
 
 [1] Sun, X., Wang, P., Yan, Z., Xu, F., Wang, R., Diao, W., ... & Fu, K. (2022). FAIR1M: A benchmark dataset for fine-grained object recognition in high-resolution remote sensing imagery. *ISPRS Journal of Photogrammetry and Remote Sensing*, 184, 116–130.
 
@@ -376,5 +376,6 @@ Ciecholewski, M., Strzelecki, M., & Farelnik, M. (2026). YOLO-MOD: YOLO-based mu
   volume  = {34},
   pages   = {102721},
   year    = {2026},
+  publisher = {Elsevier},
   doi     = {10.1016/j.softx.2026.102721}
 }
