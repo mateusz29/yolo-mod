@@ -1,6 +1,7 @@
 # YOLO-MOD Plugin
 
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.softx.2026.102721-blue)](https://doi.org/10.1016/j.softx.2026.102721)
+[![Zenodo](https://zenodo.org/badge/DOI/10.5281/zenodo.19534383.svg)](https://doi.org/10.5281/zenodo.19534383)
 
 ⚠️ Trained models are not included in this repository and must be downloaded from Zenodo (see the section below).
 ---
