@@ -360,6 +360,22 @@ In PyTorch (.pt), this initial overhead is often smaller.
 
 [1] Sun, X., Wang, P., Yan, Z., Xu, F., Wang, R., Diao, W., ... & Fu, K. (2022). FAIR1M: A benchmark dataset for fine-grained object recognition in high-resolution remote sensing imagery. *ISPRS Journal of Photogrammetry and Remote Sensing*, 184, 116–130.
 
+## Video demonstrations
+
+The following videos complement the examples presented in the accompanying *SoftwareX* article.
+
+### Video 1 – Multi-category object detection
+
+This video demonstrates selected capabilities of the YOLO-MOD plugin for QGIS, including multi-category object detection in remote sensing imagery.
+
+https://youtu.be/V_VPX7d_jLM
+
+### Video 2 – Layer merging and canvas tiling workflow
+
+This video (Video 2 accompanying the *SoftwareX* publication) demonstrates selected workflow functionalities of the YOLO-MOD plugin for QGIS, including layer merging and automated dataset generation using the Canvas Tiling tool.
+
+https://youtu.be/W3K95WyYc28
+
 ## Citation
 
 If you use YOLO-MOD in your research, please cite the corresponding SoftwareX article:
@@ -381,3 +397,4 @@ Ciecholewski, M., Strzelecki, M., & Farelnik, M. (2026). YOLO-MOD: YOLO-based mu
   publisher = {Elsevier},
   doi     = {10.1016/j.softx.2026.102721}
 }
+
