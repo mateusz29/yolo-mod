@@ -370,9 +370,9 @@ This video demonstrates selected capabilities of the YOLO-MOD plugin for QGIS, i
 
 https://youtu.be/V_VPX7d_jLM
 
-### Video 2 – Layer merging and canvas tiling workflow
+### Video 2 – Layer merging
 
-This video (Video 2 accompanying the *SoftwareX* publication) demonstrates selected workflow functionalities of the YOLO-MOD plugin for QGIS, including layer merging and automated dataset generation using the Canvas Tiling tool.
+This video (Video 2 accompanying the *SoftwareX* publication) demonstrates the layer merging workflow of the YOLO-MOD plugin for QGIS.
 
 https://youtu.be/W3K95WyYc28
 
