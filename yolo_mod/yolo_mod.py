@@ -46,8 +46,6 @@ from qgis.PyQt.QtCore import QMetaType, QSize, Qt, QRect
 from qgis.PyQt.QtGui import QColor, QIcon, QImage, QPainter, QPixmap, QPen
 from qgis.PyQt.QtWidgets import QAction, QDialog, QVBoxLayout, QLabel, QDialogButtonBox
 from ultralytics import YOLO
-from onnxruntime import InferenceSession
-import cv2
 
 from .yolo_mod_dialog import YOLOModDialog
 
@@ -90,13 +88,31 @@ class YOLOMod:
             "ship": "civilian ship"
         }
         self.object_ids = {
-            "plane": 0,
-            "bridge": 1,
-            "airport": 2,
-            "harbor": 3,
-            "vehicle": 4,
-            "ship": 5
+            "airport": 0,
+            "helicopter": 1,
+            "storage tank": 2,
+            "aircraft": 3,
+            "warship": 4,
+            "civilian ship": 5
         }
+        self.model_class_names = {
+            "no_ships": ["airport", "helicopter", "oiltank", "plane"],
+            "ships": ["ship", "warship"],
+        }
+
+    def _canonical_class_name(self, class_name):
+        """Maps a raw model class name to the canonical plugin class name."""
+        if class_name is None:
+            return None
+        normalized = str(class_name).strip().lower()
+        return self.object_names.get(normalized, normalized)
+
+    def _get_model_class_names(self, model_path):
+        """Returns the raw class names expected by the known model families."""
+        basename = os.path.basename(model_path).lower()
+        if "ship" in basename:
+            return self.model_class_names["ships"]
+        return self.model_class_names["no_ships"]
 
     def _get_layer_by_name(self, name):
         """Helper to find a map layer by its name.
@@ -234,17 +250,15 @@ class YOLOMod:
             model_path (str): The absolute path to the .pt or .onnx model file.
 
         Returns:
-            YOLO or InferenceSession or None: The loaded model object, or None if the path is invalid.
+            YOLO or None: The loaded model object, or None if the path is invalid.
         """
         if model_path not in self.model_cache:
             if not os.path.exists(model_path):
                 self._push_message("Error", f"Invalid model path: {model_path}", level=2, duration=4)
                 return None
 
-            if model_path.endswith(".pt"):
+            if model_path.endswith(".pt") or model_path.endswith(".onnx"):
                 self.model_cache[model_path] = YOLO(model_path)
-            elif model_path.endswith(".onnx"):
-                self.model_cache[model_path] = InferenceSession(model_path, providers=["CPUExecutionProvider"])
             else:
                 self._push_message("Error", "Unsupported model format. Use .pt or .onnx", level=2, duration=4)
                 return None
@@ -323,7 +337,10 @@ class YOLOMod:
         settings.setValue("YOLOMod/last_layer", self.last_selected_layer_name)
 
         is_custom, model_path, colors = self.dlg.get_active_model_info()
-        self.class_colors = colors
+        self.class_colors = {
+            self._canonical_class_name(name): value
+            for name, value in colors.items()
+        }
         self.conf_threshold = self.dlg.get_confidence_threshold()
         self.is_new_mode = (self.dlg.get_save_option() == "new")
 
@@ -332,12 +349,8 @@ class YOLOMod:
                 self._push_message("Error", "Please select a custom model path.", level=2, duration=4)
                 return
             self.models_to_run = [model_path]
-            model = self.get_model(model_path)
-            if model and hasattr(model, 'names'):
-                self.active_class_names = list(model.names.values())
         else:
             self.models_to_run = [self.dlg.lineEdit_model1.text()]
-            self.active_class_names = ["airport", "helicopter", "aircraft", "storage tank", "warship", "civilian ship"]
             if self.dlg.get_run_multiple():
                 second_model = self.dlg.get_second_model_path()
                 if second_model == self.dlg.lineEdit_model1.text():
@@ -421,10 +434,11 @@ class YOLOMod:
                 h = abs(norm_y_max - norm_y_min)
 
                 class_name = feature["class"]
-                if class_name in self.active_class_names:
-                    class_id = self.active_class_names.index(class_name)
-                else:
-                    class_id = self.object_ids.get(class_name, 0)
+                class_name = self._canonical_class_name(class_name)
+                class_id = self.object_ids.get(class_name)
+                if class_id is None:
+                    stored_class_id = feature["class_id"]
+                    class_id = int(stored_class_id) if stored_class_id not in (None, "", "NULL") else 0
 
                 yolo_lines.append(f"{class_id} {x_center:.6f} {y_center:.6f} {w:.6f} {h:.6f}")
 
@@ -764,6 +778,7 @@ class YOLOMod:
 
             pr = layer.dataProvider()
             pr.addAttributes([QgsField("class", QMetaType.Type.QString)])
+            pr.addAttributes([QgsField("class_id", QMetaType.Type.Int)])
             layer.updateFields()
             QgsProject.instance().addMapLayer(layer)
         else:
@@ -777,6 +792,7 @@ class YOLOMod:
             if layer.fields().indexFromName("class") == -1:
                 if layer.isEditable() or layer.startEditing():
                     layer.addAttribute(QgsField("class", QMetaType.Type.QString))
+                    layer.addAttribute(QgsField("class_id", QMetaType.Type.Int))
                     layer.commitChanges()
 
         return layer
@@ -798,7 +814,7 @@ class YOLOMod:
         settings.setLayers([layer])
         return self._render_to_image(settings, canvas.width(), canvas.height())
 
-    def add_detection_feature(self, extent, width, height, box,class_name, features, detected_classes, format="xyxy"):
+    def add_detection_feature(self, extent, width, height, box, class_name, class_id, features, detected_classes, format="xyxy"):
         if format == "cxcywh":  # ONNX
             cx, cy, w, h = box
             x_min = (cx - w / 2) * width
@@ -816,7 +832,7 @@ class YOLOMod:
 
         feat = QgsFeature()
         feat.setGeometry(QgsGeometry.fromPolygonXY([[QgsPointXY(x1,y1), QgsPointXY(x2,y1), QgsPointXY(x2,y2), QgsPointXY(x1,y2), QgsPointXY(x1,y1)]]))
-        feat.setAttributes([class_name])
+        feat.setAttributes([class_name, class_id])
         features.append(feat)
 
     def detect_objects(self):
@@ -843,54 +859,23 @@ class YOLOMod:
                 continue
 
             # YOLO models (Ultralytics)
-            if isinstance(model, YOLO):
-                results = model.predict(img_rgb)
-                for r in results:
-                    for i, box in enumerate(r.boxes.xyxy):
-                        score = float(r.boxes.conf[i].item())
-                        if score < self.conf_threshold:
-                            continue
-
-                        raw_name = r.names[int(r.boxes.cls[i].item())]
-                        class_name = raw_name.lower()
-                        
-                        self.add_detection_feature(extent, width, height, box.tolist(), class_name, features, detected_classes, format="xyxy")
-
-            # ONNX models (DFINE, RFDETR)
-            elif isinstance(model, InferenceSession):
-                input_name = model.get_inputs()[0].name
-                input_shape = model.get_inputs()[0].shape
-                h_in, w_in = input_shape[2], input_shape[3]
-
-                # Resize and normalize image for model input
-                resized = cv2.resize(cv2.cvtColor(img_rgb, cv2.COLOR_BGR2RGB), (w_in, h_in))
-                tensor = np.expand_dims(np.transpose(resized.astype(np.float32) / 255.0, (2, 0, 1)), axis=0)
-
-                outputs = model.run(None, {input_name: tensor})
-                output_names = [o.name for o in model.get_outputs()]
-
-                if "logits" in output_names:
-                    logits, boxes = outputs[output_names.index("logits")], outputs[output_names.index("boxes")]
-                else:
-                    boxes, logits = outputs[output_names.index("dets")], outputs[output_names.index("labels")]
-
-                logits, boxes = np.squeeze(logits), np.squeeze(boxes)
-                scores = np.max(logits, axis=-1)
-                labels = np.argmax(logits, axis=-1)
-
-                for box, score, cls in zip(boxes, scores, labels):
+            #if isinstance(model, YOLO):
+            results = model.predict(img_rgb)
+            for r in results:
+                for i, box in enumerate(r.boxes.xyxy):
+                    score = float(r.boxes.conf[i].item())
                     if score < self.conf_threshold:
                         continue
 
-                    class_name = list(self.object_ids.keys())[int(cls)]
-                    self.add_detection_feature(extent, width, height, box.tolist(), class_name, features, detected_classes, format="cxcywh")
-
-            else:
-                self._push_message("Error", "Unsupported model type.", level=2, duration=4)
-                return
+                    raw_id = int(r.boxes.cls[i].item())
+                    raw_name = r.names[raw_id]
+                    class_name = self._canonical_class_name(raw_name)
+                    
+                    class_id = self.object_ids.get(class_name, raw_id)
+                    self.add_detection_feature(extent, width, height, box.tolist(), class_name, class_id, features, detected_classes, format="xyxy")
 
         if not features:
-            self._push_message("No objects detected", level=1, duration=2)
+            self._push_message("Info", "No objects detected", level=1, duration=2)
             return
 
         # Commit features to layer

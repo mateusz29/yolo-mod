@@ -80,14 +80,14 @@ class YOLOModDialog(QtWidgets.QDialog, FORM_CLASS):
         self.toolButton_preview_img.clicked.connect(self.select_preview_img)
         self.toolButton_preview_txt.clicked.connect(self.select_preview_txt)
         self.radio_append_layer.toggled.connect(self.comboBox_target_layer.setEnabled)
-        self.display_class_names = ["plane", "bridge", "airport", "harbor", "vehicle", "ship"]
+        self.display_class_names = ["airport", "helicopter", "storage tank", "aircraft", "warship", "civilian ship"]
         self.default_colors = {
-            "plane": "blue",
-            "bridge": "orange",
-            "airport": "yellow",
-            "harbor": "red",
-            "vehicle": "cyan",
-            "ship": "magenta"
+            "airport": "blue",
+            "helicopter": "orange",
+            "aircraft": "yellow",
+            "storage tank": "red",
+            "warship": "cyan",
+            "civilian ship": "magenta"
         }
         self.color_buttons_standard = {}
         self.color_buttons_custom = {}
