@@ -35,7 +35,7 @@ The repository provides:
 
 ### Dataset
 
-The **[MSGO](https://drive.google.com/file/d/1s0u--CU-VVmv0t_O9_3TNNA2VcLahLPu/)** dataset contains optical remote sensing imagery with six object categories:
+The **[MSGO](https://mega.nz/file/TvxlVKZY#EYTy0WMJ7E_iaAh_DIGqXh2VgQLWutUm2iUjO5wdiaI)** dataset contains optical remote sensing imagery with six object categories:
 
 - **Plane**
 - **Bridge**
