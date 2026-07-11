@@ -1,60 +1,87 @@
 # YOLO-MOD Plugin
 
+## Highlights
+
+- Integration of deep learning-based object detection into QGIS workflows
+- Support for multi-class detection (planes, bridges, airports, harbors, vehicles, ships)
+- Compatibility with PyTorch (.pt) and ONNX (.onnx) models
+- Support for YOLOv12, D-FINE, and RF-DETR architectures
+
 ## Description
 
-YOLO-MOD is a QGIS plugin for object detection and classification in optical remote sensing imagery using **YOLO deep learning models**. It allows users to detect multiple object categories—such as ships, aircraft, helicopters, airports, and storage tanks—directly within standard GIS workflows. The plugin provides access to pre-trained models and tools for exporting detection results and generating datasets, without requiring prior machine learning experience. The latest version supports **YOLOv11 and YOLOv12** architectures with multiple model sizes.
+YOLO-MOD is a QGIS plugin for object detection and classification in optical remote sensing imagery using deep learning models. It allows users to detect multiple object categories—such as planes, bridges, airports, harbors, vehicles, and ships—directly within standard GIS workflows. The plugin provides access to pre-trained models and tools for exporting detection results and generating datasets, without requiring prior machine learning experience.
+
+The latest version supports **YOLOv12, D-FINE, and RF-DETR** architectures with multiple model sizes.
 
 ## Datasets and Models
 
-### Datasets
+### Model Download
 
-1. **[DOTANA](https://drive.google.com/file/d/1s0u--CU-VVmv0t_O9_3TNNA2VcLahLPu/)** – Original dataset containing `storage tank`, `airport`, `helicopter`, and `aircraft`.  
-   **[Modified DOTANA](https://mega.nz/file/2iA1RLpK#PEtxII1kMVUM60KDd4zwDGs8ghSK3w-g6Zazq_Q-bf4)** – `warships` removed to focus on non-ship objects.
+All trained models used in this project are publicly available via the Mega platform:
 
-2. **[ShipRSImageNet](https://github.com/zzndream/ShipRSImageNet?tab=readme-ov-file#dataset-download)** – Dataset containing `warships` and `civilian ships`.  
-   **[YOLO-formatted ShipRSImageNet](https://mega.nz/file/X7oFDTQI#elcggfqFufNkKySSAAkelz_PAN5UB3AoDr3AIy-irls)** – Converted/modified version for YOLO training.
+👉 https://mega.nz/folder/yyQ1SaIB#XTx5YLbTNea4Cb0QNVHhbQ
 
-### Trained Models
+The repository provides:
 
-Models are trained in **four sizes**: Small, Medium, Large, Extra Large.
+- PyTorch (`.pt`) models  
+- ONNX (`.onnx`) models  
+- Metadata files describing model architecture, training dataset, input resolution, and performance metrics  
 
-* Total of **16 trained models** (4 sizes × 2 datasets × 2 YOLO versions).
+### How to use models
 
-The **best-performing models** (based on `mAP50-95`) are available via Google Drive: [link](https://mega.nz/folder/euQ1iIza#qc6S5maLXW0JNmW4tkyn8A)
-  
-**Best model filenames:**
-- `DOTANA_no_ships_yolo12x.onnx`, `DOTANA_no_ships_yolo12x.pt`
-- `DOTANA_no_ships_yolo11x.onnx`, `DOTANA_no_ships_yolo11x.pt`
-- `ships_yolo11l.onnx`, `ships_yolo11l.pt`
-- `ships_yolo11s.onnx`, `ships_yolo11s.pt`
+1. Download the models from Mega platform
+2. Select the desired model (`.pt` or `.onnx`)  
+3. Load it in the YOLO-MOD plugin  
 
-| Dataset           | Model Size  | Yolo version | Soft-NMS | mAP50-95 | mAP50  |
-| ----------------- | ----------  | ----------   | -------- | -------- | -----  |
-| DOTANA (no ships) | Extra Large | 12           | No       | 0.6039   | 0.9591 |
-| DOTANA (no ships) | Extra Large | 11           | No       | 0.6030   | 0.9581 |
-| ShipRSImageNet    | Large       | 11           | No       | 0.7548   | 0.9025 |
-| ShipRSImageNet    | Small       | 11           | No       | 0.7543   | 0.9065 |
+### Dataset
 
-###  Old models
-The project uses models from **Madajczak, A. (2023).** *Master Thesis supplementary software (Version 1.0.0)* https://github.com/theATM/AirDetection :
-- **L6** – Large YOLOv8 model  
-- **Y9** – Small YOLOv8 model  
+The **[MSGO](https://drive.google.com/file/d/1s0u--CU-VVmv0t_O9_3TNNA2VcLahLPu/)** dataset contains optical remote sensing imagery with six object categories:
 
-## Visual Examples
+- **Plane**
+- **Bridge**
+- **Airport**
+- **Harbor**
+- **Vehicle**
+- **Ship**
 
-**DOTANA (no ships) predictions:**
+Dataset characteristics:
+- **Image resolution:** 800 × 800 pixels
+- **Image type:** Optical remote sensing imagery
 
-![DOTANA predictions](assets/dotana_no_ships_predictions.png)
+The MSGO dataset was created by combining two existing remote sensing datasets:
+- DIOR
+- DOTA v2
 
-**ShipRSImageNet predictions:**
+## Model Summary
 
-![ShipRSImageNet predictions](assets/ships_predictions.png)
+| Dataset | Model type | Model Size        | mAP50-95  | mAP50     |
+| ------- | ---------- | ----------------- | --------- | --------- |
+| MSGO    | YOLO12     | Medium            | 0.886     | 0.650     |
+| MSGO    | YOLO12     | Large             | 0.889     | 0.655     |
+| MSGO    | YOLO12     | Extra Large       | **0.892** | **0.664** |
+| MSGO    | RF-DETR    | Large             | 0.820     | 0.596     |
+| MSGO    | RF-DETR    | Extra Large       | 0.806     | 0.577     |
+| MSGO    | RF-DETR    | Extra Extra Large | 0.815     | 0.598     |
+| MSGO    | DFINE      | Medium            | 0.794     | 0.583     |
+| MSGO    | DFINE      | Large             | 0.782     | 0.574     |
+| MSGO    | DFINE      | Extra Large       | 0.783     | 0.574     |
 
-These images show grids of sample images from test sets with bounding boxes and labels around detected objects.
+
+## ⚙️ Python Dependencies
+
+⚠️ These dependencies are not installed automatically by QGIS.
+
+In addition to the plugin installation, several Python dependencies must also be installed in the QGIS Python environment:
+
+- ultralytics
+- onnx
+- onnxruntime / onnxruntime-gpu
+
+Detailed installation instructions and tested dependency versions are provided below. Future versions of the plugin are planned to be distributed through the official QGIS Plugin Repository.
 
 ## Plugin Installation
 
-1. Download the plugin ZIP: **[yolo_plugin.zip](https://mega.nz/file/2FkxwT4Q#CTQ6K70NuftbiK84Z-kDIIzTqAeMgf9Ja71KCpV7W8g)**
+1. Download the plugin ZIP: **[yolo_mod.zip](https://mega.nz/file/nyBSHRYI#l9Vaf5p6Ck8ewmY5gR5kUPgTLAF9KtT0dJaCaA_rz8c)**
 
 2. Run **QGIS**.
 
@@ -110,37 +137,90 @@ pip install numpy==1.26.4  # optional; ensure compatibility with QGIS Python env
 These versions were tested with QGIS 3.40.6 (Bratislava) and 3.42.2 (Münster) using the OSGeo4W distribution (Python 3.11).
 
 ## YOLO-MOD Plugin GUI
-The plugin is configured to let the user define the input parameters:
+
+### Detection
+
+The Detection tab contains the main object detection workflow and is divided into two subtabs: **Standard Models** and **Custom Model**.
+
+The following options are available regardless of the selected subtab:
+
 1. Select a layer - image from this layer will be processed.
-2. Select model - selected model will be used for objects recognition.
-3. Multiple layers - possibilty to enable two models.
-4. Select second model - second model used for object detection.
-5. Save detections to - specifies whether detections are saved to a new layer or appended to an existing layer (e.g. “YOLO Detections 1”).
-6. Class colors - user can define colors for each class.
-7. Confidence threshold - results with confidence below threshold will not be presented.  
-8. Fill rectangles - enable to draw filled rectangles for detected objects.
-9. Fill transparency - sets transparency level for filled rectangles.
-10. Outline transparency - sets transparency level for rectangle outlines.
-<img src="assets/parameters.png" alt="GUI" width="50%">
+2. Save detections to - specifies whether detections are saved to a new layer or appended to an existing layer (e.g. "YOLO Detections 1").
+3. Confidence threshold - detections below the selected confidence threshold are discarded.
+4. Fill rectangles - enables drawing filled bounding boxes.
+5. Fill transparency - sets the transparency level for filled rectangles.
+6. Outline transparency - sets the transparency level for bounding box outlines.
+
+<img src="assets/detection_common_options.png" alt="Detection Common Options" width="50%">
+
+### Standard Models
+
+The Standard Models subtab provides access to the pre-trained models distributed with the project.
+
+Additional options include:
+
+1. Select model - choose one of the provided PyTorch (`.pt`) or ONNX (`.onnx`) models.
+2. Multiple models - enables inference using two models simultaneously.
+3. Select second model - choose the second model used during detection.
+4. Class names and colors - displays all supported object classes together with their assigned display colors.
+
+<img src="assets/detection_standard_models.png" alt="Standard Models" width="50%">
+
+### Custom Model
+
+The Custom Model subtab allows users to perform inference using their own trained Ultralytics YOLO model.
+
+Additional options include:
+
+1. Upload model - load a custom PyTorch (`.pt`) Ultralytics YOLO model.
+2. Dynamically loaded classes - class names are automatically read from the selected model and displayed in the interface. Each class is assigned a random display color, allowing custom models to be used without additional configuration.
+
+<img src="assets/detection_custom_model.png" alt="Custom Model" width="50%">
+
+### Edit Detections
+
+The previous **Merge Layers** tab has been expanded and renamed to **Edit Detections**.
+
+The tab provides tools for editing detection layers, including:
+
+- merging detection features from one layer into another,
+- deleting selected detection features.
+
+Features to be removed are selected using the standard QGIS selection tools, such as **Select Features by Area** or **Select Features by Single Click**.
+
+<img src="assets/plugin_edit_detections.png" alt="Edit Detections" width="50%">
+
+### Export Results
 
 The YOLO-MOD plugin provides an export interface for layer data, including:
+
 - map extent export to PNG,
 - detection export in YOLO format,
 - output directory selection,
 - source layer selection.
-<img src="assets/plugin_save_data.png" alt="GUI" width="50%">
 
-The YOLO-MOD plugin interface enables:
-- Preview saved detections using a raster image (.png) and the corresponding YOLO annotation file (.txt).
-<img src="assets/plugin_exp_preview.png" alt="GUI" width="50%">
+<img src="assets/plugin_save_data.png" alt="Export Results" width="50%">
 
-Merge detection results from multiple layers by selecting a source and target layer. The merged output is saved to the target layer.
+### Preview Export
 
-<img src="assets/plugin_merge_layers.png" alt="GUI" width="50%">
+Preview exported detections using a raster image (`.png`) together with the corresponding YOLO annotation file (`.txt`).
 
-Automatically split the current QGIS map extent into image tiles based on user-defined width, height, and output directory.
+<img src="assets/plugin_exp_preview.png" alt="Preview Export" width="50%">
 
-<img src="assets/plugin_canvas tiling.png" alt="GUI" width="50%">
+### Canvas Tiling
+
+The Canvas Tiling tool automatically splits the current QGIS map extent into image tiles.
+
+The user can configure:
+
+- tile width,
+- tile height,
+- tile overlap percentage,
+- output directory.
+
+Instead of starting immediately, the **Preview & Start Tiling** button first displays a preview of the generated tile grid. The user can then confirm the operation to generate the tiles or cancel it before any files are written.
+
+<img src="assets/plugin_canvas_tiling.png" alt="Canvas Tiling" width="50%">
 
 ## Illustrative examples
 This example demonstrates expected output for planes recognition using default parameters and Large YOLOv8 model:
