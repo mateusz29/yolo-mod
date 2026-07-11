@@ -890,7 +890,7 @@ class YOLOMod:
                 return
 
         if not features:
-            self._push_message("No objects detected", level=1, duration=2)
+            self._push_message("Info", "No objects detected", level=1, duration=2)
             return
 
         # Commit features to layer
