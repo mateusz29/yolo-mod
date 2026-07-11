@@ -278,37 +278,90 @@ pip install numpy==1.26.4  # optional; ensure compatibility with QGIS Python env
 These versions were tested with QGIS 3.40.6 (Bratislava) and 3.42.2 (Münster) using the OSGeo4W distribution (Python 3.11).
 
 ## YOLO-MOD Plugin GUI
-The plugin is configured to let the user define the input parameters:
+
+### Detection
+
+The Detection tab contains the main object detection workflow and is divided into two subtabs: **Standard Models** and **Custom Model**.
+
+The following options are available regardless of the selected subtab:
+
 1. Select a layer - image from this layer will be processed.
-2. Select model - selected model will be used for objects recognition.
-3. Multiple layers - possibilty to enable two models.
-4. Select second model - second model used for object detection.
-5. Save detections to - specifies whether detections are saved to a new layer or appended to an existing layer (e.g. “YOLO Detections 1”).
-6. Class colors - user can define colors for each class.
-7. Confidence threshold - results with confidence below threshold will not be presented.  
-8. Fill rectangles - enable to draw filled rectangles for detected objects.
-9. Fill transparency - sets transparency level for filled rectangles.
-10. Outline transparency - sets transparency level for rectangle outlines.
-<img src="assets/parameters.png" alt="GUI" width="50%">
+2. Save detections to - specifies whether detections are saved to a new layer or appended to an existing layer (e.g. "YOLO Detections 1").
+3. Confidence threshold - detections below the selected confidence threshold are discarded.
+4. Fill rectangles - enables drawing filled bounding boxes.
+5. Fill transparency - sets the transparency level for filled rectangles.
+6. Outline transparency - sets the transparency level for bounding box outlines.
+
+<img src="assets/detection_common_options.png" alt="Detection Common Options" width="50%">
+
+### Standard Models
+
+The Standard Models subtab provides access to the pre-trained models distributed with the project.
+
+Additional options include:
+
+1. Select model - choose one of the provided PyTorch (`.pt`) or ONNX (`.onnx`) models.
+2. Multiple models - enables inference using two models simultaneously.
+3. Select second model - choose the second model used during detection.
+4. Class names and colors - displays all supported object classes together with their assigned display colors.
+
+<img src="assets/detection_standard_models.png" alt="Standard Models" width="50%">
+
+### Custom Model
+
+The Custom Model subtab allows users to perform inference using their own trained Ultralytics YOLO model.
+
+Additional options include:
+
+1. Upload model - load a custom PyTorch (`.pt`) Ultralytics YOLO model.
+2. Dynamically loaded classes - class names are automatically read from the selected model and displayed in the interface. Each class is assigned a random display color, allowing custom models to be used without additional configuration.
+
+<img src="assets/detection_custom_model.png" alt="Custom Model" width="50%">
+
+### Edit Detections
+
+The previous **Merge Layers** tab has been expanded and renamed to **Edit Detections**.
+
+The tab provides tools for editing detection layers, including:
+
+- merging detection features from one layer into another,
+- deleting selected detection features.
+
+Features to be removed are selected using the standard QGIS selection tools, such as **Select Features by Area** or **Select Features by Single Click**.
+
+<img src="assets/plugin_edit_detections.png" alt="Edit Detections" width="50%">
+
+### Export Results
 
 The YOLO-MOD plugin provides an export interface for layer data, including:
+
 - map extent export to PNG,
 - detection export in YOLO format,
 - output directory selection,
 - source layer selection.
-<img src="assets/plugin_save_data.png" alt="GUI" width="50%">
 
-The YOLO-MOD plugin interface enables:
-- Preview saved detections using a raster image (.png) and the corresponding YOLO annotation file (.txt).
-<img src="assets/plugin_exp_preview.png" alt="GUI" width="50%">
+<img src="assets/plugin_save_data.png" alt="Export Results" width="50%">
 
-Merge detection results from multiple layers by selecting a source and target layer. The merged output is saved to the target layer.
+### Preview Export
 
-<img src="assets/plugin_merge_layers.png" alt="GUI" width="50%">
+Preview exported detections using a raster image (`.png`) together with the corresponding YOLO annotation file (`.txt`).
 
-Automatically split the current QGIS map extent into image tiles based on user-defined width, height, and output directory.
+<img src="assets/plugin_exp_preview.png" alt="Preview Export" width="50%">
 
-<img src="assets/plugin_canvas_tiling.png" alt="GUI" width="50%">
+### Canvas Tiling
+
+The Canvas Tiling tool automatically splits the current QGIS map extent into image tiles.
+
+The user can configure:
+
+- tile width,
+- tile height,
+- tile overlap percentage,
+- output directory.
+
+Instead of starting immediately, the **Preview & Start Tiling** button first displays a preview of the generated tile grid. The user can then confirm the operation to generate the tiles or cancel it before any files are written.
+
+<img src="assets/plugin_canvas_tiling.png" alt="Canvas Tiling" width="50%">
 
 ## Illustrative examples
 This example demonstrates expected output for planes recognition using default parameters and Large YOLOv8 model:
