@@ -257,11 +257,15 @@ class YOLOMod:
                 self._push_message("Error", f"Invalid model path: {model_path}", level=2, duration=4)
                 return None
 
+        try:
             if model_path.endswith(".pt") or model_path.endswith(".onnx"):
                 self.model_cache[model_path] = YOLO(model_path)
             else:
                 self._push_message("Error", "Unsupported model format. Use .pt or .onnx", level=2, duration=4)
                 return None
+        except Exception:
+            self._push_message("Error", f"Failed to load model: {model_path}", level=2, duration=4)
+            return None
 
         return self.model_cache[model_path]
 
@@ -851,28 +855,39 @@ class YOLOMod:
         extent = self.iface.mapCanvas().extent()
         features = []
         detected_classes = set()
+        any_model_succeeded = False
 
         # Execute selected models
         for m_path in self.models_to_run:
-            model = self.get_model(m_path)
-            if not model:
+            try:
+                model = self.get_model(m_path)
+                if not model:
+                    continue
+
+                # YOLO models (Ultralytics)
+                #if isinstance(model, YOLO):
+                results = model.predict(img_rgb)
+                for r in results:
+                    for i, box in enumerate(r.boxes.xyxy):
+                        score = float(r.boxes.conf[i].item())
+                        if score < self.conf_threshold:
+                            continue
+
+                        raw_id = int(r.boxes.cls[i].item())
+                        raw_name = r.names[raw_id]
+                        class_name = self._canonical_class_name(raw_name)
+                        
+                        class_id = self.object_ids.get(class_name, raw_id)
+                        self.add_detection_feature(extent, width, height, box.tolist(), class_name, class_id, features, detected_classes, format="xyxy")
+                
+                any_model_succeeded = True
+
+            except Exception:
+                self._push_message("Error", f"Failed to process model: {m_path}", level=2, duration=4)
                 continue
 
-            # YOLO models (Ultralytics)
-            #if isinstance(model, YOLO):
-            results = model.predict(img_rgb)
-            for r in results:
-                for i, box in enumerate(r.boxes.xyxy):
-                    score = float(r.boxes.conf[i].item())
-                    if score < self.conf_threshold:
-                        continue
-
-                    raw_id = int(r.boxes.cls[i].item())
-                    raw_name = r.names[raw_id]
-                    class_name = self._canonical_class_name(raw_name)
-                    
-                    class_id = self.object_ids.get(class_name, raw_id)
-                    self.add_detection_feature(extent, width, height, box.tolist(), class_name, class_id, features, detected_classes, format="xyxy")
+        if not any_model_succeeded:
+            return
 
         if not features:
             self._push_message("Info", "No objects detected", level=1, duration=2)
