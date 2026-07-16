@@ -241,12 +241,16 @@ class YOLOMod:
                 self._push_message("Error", f"Invalid model path: {model_path}", level=2, duration=4)
                 return None
 
-            if model_path.endswith(".pt"):
-                self.model_cache[model_path] = YOLO(model_path)
-            elif model_path.endswith(".onnx"):
-                self.model_cache[model_path] = InferenceSession(model_path, providers=["CPUExecutionProvider"])
-            else:
-                self._push_message("Error", "Unsupported model format. Use .pt or .onnx", level=2, duration=4)
+            try:
+                if model_path.endswith(".pt"):
+                    self.model_cache[model_path] = YOLO(model_path)
+                elif model_path.endswith(".onnx"):
+                    self.model_cache[model_path] = InferenceSession(model_path, providers=["CPUExecutionProvider"])
+                else:
+                    self._push_message("Error", "Unsupported model format. Use .pt or .onnx", level=2, duration=4)
+                    return None
+            except Exception:
+                self._push_message("Error", f"Failed to load model: {model_path}", level=2, duration=4)
                 return None
 
         return self.model_cache[model_path]
@@ -835,59 +839,70 @@ class YOLOMod:
         extent = self.iface.mapCanvas().extent()
         features = []
         detected_classes = set()
+        any_model_succeeded = False
 
         # Execute selected models
         for m_path in self.models_to_run:
-            model = self.get_model(m_path)
-            if not model:
-                continue
+            try:
+                model = self.get_model(m_path)
+                if not model:
+                    continue
 
-            # YOLO models (Ultralytics)
-            if isinstance(model, YOLO):
-                results = model.predict(img_rgb)
-                for r in results:
-                    for i, box in enumerate(r.boxes.xyxy):
-                        score = float(r.boxes.conf[i].item())
+                # YOLO models (Ultralytics)
+                if isinstance(model, YOLO):
+                    results = model.predict(img_rgb)
+                    for r in results:
+                        for i, box in enumerate(r.boxes.xyxy):
+                            score = float(r.boxes.conf[i].item())
+                            if score < self.conf_threshold:
+                                continue
+
+                            raw_name = r.names[int(r.boxes.cls[i].item())]
+                            class_name = raw_name.lower()
+                            
+                            self.add_detection_feature(extent, width, height, box.tolist(), class_name, features, detected_classes, format="xyxy")
+
+                # ONNX models (DFINE, RFDETR)
+                elif isinstance(model, InferenceSession):
+                    input_name = model.get_inputs()[0].name
+                    input_shape = model.get_inputs()[0].shape
+                    h_in, w_in = input_shape[2], input_shape[3]
+
+                    # Resize and normalize image for model input
+                    resized = cv2.resize(cv2.cvtColor(img_rgb, cv2.COLOR_BGR2RGB), (w_in, h_in))
+                    tensor = np.expand_dims(np.transpose(resized.astype(np.float32) / 255.0, (2, 0, 1)), axis=0)
+
+                    outputs = model.run(None, {input_name: tensor})
+                    output_names = [o.name for o in model.get_outputs()]
+
+                    if "logits" in output_names:
+                        logits, boxes = outputs[output_names.index("logits")], outputs[output_names.index("boxes")]
+                    else:
+                        boxes, logits = outputs[output_names.index("dets")], outputs[output_names.index("labels")]
+
+                    logits, boxes = np.squeeze(logits), np.squeeze(boxes)
+                    scores = np.max(logits, axis=-1)
+                    labels = np.argmax(logits, axis=-1)
+
+                    for box, score, cls in zip(boxes, scores, labels):
                         if score < self.conf_threshold:
                             continue
 
-                        raw_name = r.names[int(r.boxes.cls[i].item())]
-                        class_name = raw_name.lower()
-                        
-                        self.add_detection_feature(extent, width, height, box.tolist(), class_name, features, detected_classes, format="xyxy")
+                        class_name = list(self.object_ids.keys())[int(cls)]
+                        self.add_detection_feature(extent, width, height, box.tolist(), class_name, features, detected_classes, format="cxcywh")
 
-            # ONNX models (DFINE, RFDETR)
-            elif isinstance(model, InferenceSession):
-                input_name = model.get_inputs()[0].name
-                input_shape = model.get_inputs()[0].shape
-                h_in, w_in = input_shape[2], input_shape[3]
-
-                # Resize and normalize image for model input
-                resized = cv2.resize(cv2.cvtColor(img_rgb, cv2.COLOR_BGR2RGB), (w_in, h_in))
-                tensor = np.expand_dims(np.transpose(resized.astype(np.float32) / 255.0, (2, 0, 1)), axis=0)
-
-                outputs = model.run(None, {input_name: tensor})
-                output_names = [o.name for o in model.get_outputs()]
-
-                if "logits" in output_names:
-                    logits, boxes = outputs[output_names.index("logits")], outputs[output_names.index("boxes")]
                 else:
-                    boxes, logits = outputs[output_names.index("dets")], outputs[output_names.index("labels")]
+                    self._push_message("Error", "Unsupported model type.", level=2, duration=4)
+                    return
 
-                logits, boxes = np.squeeze(logits), np.squeeze(boxes)
-                scores = np.max(logits, axis=-1)
-                labels = np.argmax(logits, axis=-1)
+                any_model_succeeded = True
 
-                for box, score, cls in zip(boxes, scores, labels):
-                    if score < self.conf_threshold:
-                        continue
-
-                    class_name = list(self.object_ids.keys())[int(cls)]
-                    self.add_detection_feature(extent, width, height, box.tolist(), class_name, features, detected_classes, format="cxcywh")
-
-            else:
-                self._push_message("Error", "Unsupported model type.", level=2, duration=4)
+            except Exception as e:
+                self._push_message("Error", f"Error running model {os.path.basename(m_path)}: {str(e)}", level=2, duration=4)
                 return
+
+        if not any_model_succeeded:
+            return
 
         if not features:
             self._push_message("Info", "No objects detected", level=1, duration=2)
