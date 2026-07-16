@@ -554,6 +554,11 @@ class YOLOMod:
         canvas = self.iface.mapCanvas()
         canvas_size = canvas.size()
         t_w, t_h = p["width"], p["height"]
+
+        if t_w > canvas_size.width() and t_h > canvas_size.height():
+            self._push_message("Error", "Tile size cannot be larger than the canvas size.", level=2, duration=4)
+            return
+
         overlap = p.get("overlap", 0) / 100.0
 
         step_w = max(1, int(t_w * (1 - overlap)))
@@ -614,23 +619,8 @@ class YOLOMod:
         if preview.exec_() != QDialog.Accepted:
             return
 
-        # Perform actual tiling
-        settings = QgsMapSettings(canvas.mapSettings())
-        settings.setLayers(self._get_filtered_layers())
-
-        full_extent = settings.extent()
-        canvas_size = settings.outputSize()
-
-        px_w_geo = full_extent.width() / canvas_size.width()
-        px_h_geo = full_extent.height() / canvas_size.height()
-
-        total_tiles = cols * rows
-
-        if total_tiles == 0:
-            self._push_message("Error", "Tile size is larger than current canvas.", level=2, duration=4)
-            return
-
         count = 0
+
         for r in range(rows):
             for c in range(cols):
                 px_x = c * step_w
@@ -639,23 +629,13 @@ class YOLOMod:
                 actual_w = min(t_w, preview_size.width() - px_x)
                 actual_h = min(t_h, preview_size.height() - px_y)
 
-                x_min = full_extent.xMinimum() + (px_x * px_w_geo)
-                y_max = full_extent.yMaximum() - (px_y * px_h_geo)
-                x_max = x_min + (actual_w * px_w_geo)
-                y_min = y_max - (actual_h * px_h_geo)
+                tile_img = base_img.copy(px_x, px_y, actual_w, actual_h)
 
-                tile_extent = QgsRectangle(x_min, y_min, x_max, y_max)
-                settings.setExtent(tile_extent)
-                settings.setOutputSize(QSize(actual_w, actual_h))
-
-                map_img = self._render_to_image(settings, actual_w, actual_h)
-
-                # Pad to uniform tile size
                 final_tile = QImage(QSize(t_w, t_h), QImage.Format_ARGB32_Premultiplied)
                 final_tile.fill(QColor(0, 0, 0))
 
                 final_painter = QPainter(final_tile)
-                final_painter.drawImage(0, 0, map_img)
+                final_painter.drawImage(0, 0, tile_img)
                 final_painter.end()
 
                 filename = f"tile_{t_w}_{count}.png"
