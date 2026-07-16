@@ -98,7 +98,7 @@
              <item row="1" column="0" colspan="2">
               <widget class="QLabel" name="label_custom_info">
                <property name="text">
-                <string>Note: Custom model must be a YOLO (Ultralytics) model.
+                <string>Note: Custom model must be a YOLO (Ultralytics, at least YOLOv8) model.
 Classes will be loaded dynamically from the .pt file.</string>
                </property>
                <property name="styleSheet">
