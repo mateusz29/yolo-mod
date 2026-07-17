@@ -40,7 +40,6 @@ from qgis.core import (
     QgsVectorFileWriter,
     QgsVectorLayer,
     QgsMapLayer,
-    QgsRectangle
 )
 from qgis.PyQt.QtCore import QMetaType, QSize, Qt, QRect
 from qgis.PyQt.QtGui import QColor, QIcon, QImage, QPainter, QPixmap, QPen
