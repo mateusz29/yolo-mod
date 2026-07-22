@@ -67,6 +67,8 @@ class YOLOModDialog(QtWidgets.QDialog, FORM_CLASS):
         self.lineEdit_model2.setEnabled(False)
         self.toolButton_model2.setEnabled(False)
         self.btn_tiling_run.setText("Preview && Start Tiling")
+        self._tiling_padding_color = QColor("#000000")
+        self._apply_tiling_padding_color(self._tiling_padding_color)
 
         # Connect UI interactions
         self.checkBox_run_multiple.stateChanged.connect(
@@ -79,6 +81,7 @@ class YOLOModDialog(QtWidgets.QDialog, FORM_CLASS):
         self.toolButton_tiling_dir.clicked.connect(self.select_tiling_dir)
         self.toolButton_preview_img.clicked.connect(self.select_preview_img)
         self.toolButton_preview_txt.clicked.connect(self.select_preview_txt)
+        self.btn_tiling_padding_color.clicked.connect(self.select_tiling_padding_color)
         self.radio_append_layer.toggled.connect(self.comboBox_target_layer.setEnabled)
         self.display_class_names = ["airport", "helicopter", "storage tank", "aircraft", "warship", "civilian ship"]
         self.default_colors = {
@@ -452,14 +455,30 @@ class YOLOModDialog(QtWidgets.QDialog, FORM_CLASS):
         """Retrieves tiling configuration from the UI.
 
         Returns:
-            dict: Dictionary with keys "width", "height", and "dir".
+            dict: Dictionary with keys "width", "height", "dir", and "padding_color".
         """
         return {
             "width": self.spinBox_tile_width.value(),
             "height": self.spinBox_tile_height.value(),
             "overlap": self.spinBox_tile_overlap.value(),
-            "dir": self.lineEdit_tiling_dir.text()
+            "dir": self.lineEdit_tiling_dir.text(),
+            "padding_color": self._tiling_padding_color.name(),
         }
+
+    def _apply_tiling_padding_color(self, color):
+        """Updates the tiling padding color button and cached value."""
+        qcolor = QColor(color)
+        color_hex = qcolor.name()
+        self._tiling_padding_color = QColor(color_hex)
+        self.btn_tiling_padding_color.setText(color_hex)
+        text_color = "#000000" if qcolor.lightness() > 160 else "#FFFFFF"
+        self.btn_tiling_padding_color.setStyleSheet(f"background-color: {color_hex}; color: {text_color};")
+
+    def select_tiling_padding_color(self):
+        """Opens a color picker for the canvas tiling padding color."""
+        color = QColorDialog.getColor(self._tiling_padding_color, self, "Select Tiling Padding Color")
+        if color.isValid():
+            self._apply_tiling_padding_color(color)
 
     def set_canvas_resolution_display(self, width, height):
         """Updates the UI label showing the current map canvas resolution.
