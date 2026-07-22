@@ -139,7 +139,7 @@ class YOLOMod:
             clean_layers.append(layer)
         return clean_layers
 
-    def _render_to_image(self, settings, width, height, transparent=True):
+    def _render_to_image(self, settings, width, height, transparent=True, background_color=None):
         """Helper to render map settings to a QImage.
 
         Args:
@@ -153,7 +153,10 @@ class YOLOMod:
             QImage: The rendered map image.
         """
         image = QImage(QSize(width, height), QImage.Format_ARGB32_Premultiplied)
-        image.fill(QColor(0, 0, 0, 0) if transparent else QColor(0, 0, 0))
+        if transparent:
+            image.fill(QColor(0, 0, 0, 0))
+        else:
+            image.fill(QColor(background_color) if background_color is not None else QColor(0, 0, 0))
         painter = QPainter(image)
         job = QgsMapRendererCustomPainterJob(settings, painter)
         job.start()
@@ -543,7 +546,7 @@ class YOLOMod:
 
         Calculates a grid based on user-defined pixel dimensions. For tiles at 
         the edges that do not fit the full dimensions, the available map area 
-        is rendered and padded with a black background (letterboxed).
+        is rendered and padded with a user-selected background color (letterboxed).
         """
         p = self.dlg.get_tiling_params()
         if not p["dir"] or not os.path.isdir(p["dir"]):
@@ -567,11 +570,11 @@ class YOLOMod:
         cols = max(1, math.ceil((canvas_size.width() - t_w) / step_w) + 1) if canvas_size.width() > t_w else 1
         rows = max(1, math.ceil((canvas_size.height() - t_h) / step_h) + 1) if canvas_size.height() > t_h else 1
 
-        # Render one large image of the map extent matching the tiling span
-        preview_size = QSize((cols - 1) * step_w + t_w, (rows - 1) * step_h + t_h)
+        # Render the visible canvas once; edge tiles are clipped against the real canvas size.
+        padding_color = QColor(p.get("padding_color", "#000000"))
         settings = QgsMapSettings(canvas.mapSettings())
         settings.setLayers(self._get_filtered_layers())
-        base_img = self._render_to_image(settings, preview_size.width(), preview_size.height(), transparent=False)
+        base_img = self._render_to_image(settings, canvas_size.width(), canvas_size.height(), transparent=False, background_color=padding_color)
 
         # Create a grid image to show tiles separated by a gap
         gap = max(2, int(min(t_w, t_h) * 0.02))
@@ -587,8 +590,10 @@ class YOLOMod:
                 px_y = r * step_h
 
                 # The actual region extracted from the map
-                actual_w = min(t_w, preview_size.width() - px_x)
-                actual_h = min(t_h, preview_size.height() - px_y)
+                actual_w = max(0, min(t_w, canvas_size.width() - px_x))
+                actual_h = max(0, min(t_h, canvas_size.height() - px_y))
+                if actual_w == 0 or actual_h == 0:
+                    continue
                 tile_rect = QRect(px_x, px_y, actual_w, actual_h)
                 tile_sub_img = base_img.copy(tile_rect)
 
@@ -596,8 +601,8 @@ class YOLOMod:
                 dest_x = c * (t_w + gap)
                 dest_y = r * (t_h + gap)
 
-                # Draw black background padding for the tile
-                painter.fillRect(dest_x, dest_y, t_w, t_h, QColor(0, 0, 0))
+                # Draw padding background for the tile
+                painter.fillRect(dest_x, dest_y, t_w, t_h, padding_color)
                 # Draw the actual map piece on top
                 painter.drawImage(dest_x, dest_y, tile_sub_img)
                 
@@ -625,13 +630,15 @@ class YOLOMod:
                 px_x = c * step_w
                 px_y = r * step_h
 
-                actual_w = min(t_w, preview_size.width() - px_x)
-                actual_h = min(t_h, preview_size.height() - px_y)
+                actual_w = max(0, min(t_w, canvas_size.width() - px_x))
+                actual_h = max(0, min(t_h, canvas_size.height() - px_y))
+                if actual_w == 0 or actual_h == 0:
+                    continue
 
                 tile_img = base_img.copy(px_x, px_y, actual_w, actual_h)
 
                 final_tile = QImage(QSize(t_w, t_h), QImage.Format_ARGB32_Premultiplied)
-                final_tile.fill(QColor(0, 0, 0))
+                final_tile.fill(padding_color)
 
                 final_painter = QPainter(final_tile)
                 final_painter.drawImage(0, 0, tile_img)
