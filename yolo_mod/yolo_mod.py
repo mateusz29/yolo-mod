@@ -585,7 +585,7 @@ class YOLOMod:
         rows = max(1, math.ceil((canvas_size.height() - t_h) / step_h) + 1) if canvas_size.height() > t_h else 1
 
         # Render the visible canvas once; edge tiles are clipped against the real canvas size.
-        padding_color = QColor(p.get("padding_color", "#000000"))
+        padding_color = QColor(p.get("padding_color", "#FFFFFF"))
         settings = QgsMapSettings(canvas.mapSettings())
         settings.setLayers(self._get_filtered_layers())
         base_img = self._render_to_image(settings, canvas_size.width(), canvas_size.height(), transparent=False, background_color=padding_color)
