@@ -67,7 +67,7 @@ class YOLOModDialog(QtWidgets.QDialog, FORM_CLASS):
         self.lineEdit_model2.setEnabled(False)
         self.toolButton_model2.setEnabled(False)
         self.btn_tiling_run.setText("Preview && Start Tiling")
-        self._tiling_padding_color = QColor("#000000")
+        self._tiling_padding_color = QColor("#FFFFFF")
         self._apply_tiling_padding_color(self._tiling_padding_color)
 
         # Connect UI interactions
