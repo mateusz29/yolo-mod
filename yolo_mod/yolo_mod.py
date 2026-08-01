@@ -80,6 +80,7 @@ class YOLOMod:
         self.menu = "&YOLO-MOD"
         self.model_cache = {}
         self.last_selected_layer_name = None
+        self.active_class_names = ["airport", "helicopter", "aircraft", "storage tank", "warship", "civilian ship"]
         self.object_names = {
             "airport": "airport",
             "helicopter": "helicopter",
