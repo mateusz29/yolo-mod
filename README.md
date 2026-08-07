@@ -18,7 +18,7 @@
 
 ## Current release
 
-Version: **v2.0.0**
+Version: **v2.1.0**
 
 Latest plugin package:  
 yolo_mod.zip
