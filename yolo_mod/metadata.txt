@@ -13,7 +13,7 @@ tracker=https://github.com/mateusz29/yolo-mod/issues
 repository=https://github.com/mateusz29/yolo-mod
 homepage=https://github.com/mateusz29/yolo-mod
 
-changelog=2.1.0 - Added support for custom Ultralytics YOLO models, layer merging, canvas tiling, and object detection editing.
+changelog=2.1.0 - Added custom Ultralytics YOLO models, layer merging, canvas tiling, object detection editing, and usability improvements.
 
 tags=yolo, object detection, deep learning, remote sensing, raster, qgis, onnx, pytorch
 category=Raster
