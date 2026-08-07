@@ -9,3 +9,7 @@ Object classes:
 - Harbor
 - Vehicle
 - Ship
+  
+## Files
+
+- `yolo12m_demo.pt` – example user-trained Ultralytics YOLOv12 model corresponding to the interface shown in Fig. 2(a) of the accompanying SoftwareX article.
