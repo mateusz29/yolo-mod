@@ -3,8 +3,8 @@ name=YOLO-MOD
 qgisMinimumVersion=3.40
 qgisMaximumVersion=3.99
 description=Deep learning-based object detection in raster data using YOLO models within QGIS.
-version=1.0.0
-author=Mateusz Strzelecki, Miraslau Farelnik, Marcin Ciecholewski
+version=2.1.0
+author=Mateusz Strzelecki, Marcin Ciecholewski
 email=marcin.ciecholewski@pg.edu.pl
 
 about=YOLO-MOD is a QGIS plugin that enables the application of YOLO-based object detection models directly to georeferenced raster data within standard GIS workflows. The plugin supports multi-class detection (e.g. ships, aircraft, helicopters, airports, storage tanks) and integrates both PyTorch (.pt) and ONNX (.onnx) model formats. It provides tools for exporting map extents, generating YOLO-format annotations, and previewing detection results. The plugin is designed for users with limited machine learning experience and supports reproducible remote sensing analysis.
@@ -13,7 +13,7 @@ tracker=https://github.com/mateusz29/yolo-mod/issues
 repository=https://github.com/mateusz29/yolo-mod
 homepage=https://github.com/mateusz29/yolo-mod
 
-changelog=1.0.0 - Initial public release.
+changelog=2.1.0 - Added support for custom Ultralytics YOLO models, layer merging, canvas tiling, and object detection editing.
 
 tags=yolo, object detection, deep learning, remote sensing, raster, qgis, onnx, pytorch
 category=Raster
