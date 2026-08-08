@@ -35,7 +35,7 @@ The repository provides:
 
 ### Dataset
 
-The **[MSGO](https://mega.nz/file/TvxlVKZY#EYTy0WMJ7E_iaAh_DIGqXh2VgQLWutUm2iUjO5wdiaI)** dataset contains optical remote sensing imagery with six object categories:
+The **[dataset](https://mega.nz/file/TvxlVKZY#EYTy0WMJ7E_iaAh_DIGqXh2VgQLWutUm2iUjO5wdiaI)** contains optical remote sensing imagery with six object categories:
 
 - **Plane**
 - **Bridge**
@@ -48,24 +48,48 @@ Dataset characteristics:
 - **Image resolution:** 800 × 800 pixels
 - **Image type:** Optical remote sensing imagery
 
-The MSGO dataset was created by combining two existing remote sensing datasets:
+The dataset was created by combining two existing remote sensing datasets:
 - DIOR
 - DOTA v2
 
-## Model Summary
+## Hardware Environments
 
-| Dataset | Model type | Model Size        | mAP50-95  | mAP50     |
-| ------- | ---------- | ----------------- | --------- | --------- |
-| MSGO    | YOLO12     | Medium            | 0.886     | 0.650     |
-| MSGO    | YOLO12     | Large             | 0.889     | 0.655     |
-| MSGO    | YOLO12     | Extra Large       | **0.892** | **0.664** |
-| MSGO    | RF-DETR    | Large             | 0.820     | 0.596     |
-| MSGO    | RF-DETR    | Extra Large       | 0.806     | 0.577     |
-| MSGO    | RF-DETR    | Extra Extra Large | 0.815     | 0.598     |
-| MSGO    | DFINE      | Medium            | 0.794     | 0.583     |
-| MSGO    | DFINE      | Large             | 0.782     | 0.574     |
-| MSGO    | DFINE      | Extra Large       | 0.783     | 0.574     |
+Models were trained and evaluated on two workstation configurations differing in GPU hardware:
 
+- **Workstation 1:** NVIDIA RTX 6000 Ada Generation (48 GB VRAM)
+- **Workstation 2:** NVIDIA RTX 6000 Blackwell (96 GB VRAM)
+
+## Results
+
+Performance was evaluated on the test split using standard COCO mAP metrics.
+
+### Workstation 1
+
+| Architecture | Variant | mAP50 | mAP50-95 |
+|:---|:---:|:---:|:---:|
+| **YOLOv12** | M | 0.886 | 0.650 |
+| **YOLOv12** | L | 0.889 | 0.655 |
+| **YOLOv12** | XL | 0.892 | 0.664 |
+| **RF-DETR** | L | 0.820 | 0.596 |
+| **RF-DETR** | XL | 0.806 | 0.577 |
+| **RF-DETR** | 2XL | 0.815 | 0.598 |
+| **D-FINE** | M | 0.795 | 0.583 |
+| **D-FINE** | L | 0.783 | 0.574 |
+| **D-FINE** | XL | 0.783 | 0.575 |
+
+### Workstation 2
+
+| Architecture | Variant | mAP50 | mAP50-95 |
+|:---|:---:|:---:|:---:|
+| **YOLOv12** | M | 0.896 | 0.626 |
+| **YOLOv12** | L | 0.897 | 0.639 |
+| **YOLOv12** | XL | **0.899** | **0.635** |
+| **RF-DETR** | L | 0.806 | 0.576 |
+| **RF-DETR** | XL | 0.816 | 0.591 |
+| **RF-DETR** | 2XL | 0.826 | 0.607 |
+| **D-FINE** | M | 0.792 | 0.587 |
+| **D-FINE** | L | 0.788 | 0.581 |
+| **D-FINE** | XL | 0.793 | 0.590 |
 
 ## ⚙️ Python Dependencies
 
@@ -81,7 +105,7 @@ Detailed installation instructions and tested dependency versions are provided b
 
 ## Plugin Installation
 
-1. Download the plugin ZIP: **[yolo_mod.zip](https://mega.nz/file/nyBSHRYI#l9Vaf5p6Ck8ewmY5gR5kUPgTLAF9KtT0dJaCaA_rz8c)**
+1. Download the plugin ZIP: **[yolo_mod.zip](https://mega.nz/file/LyRmEKaK#51K4l8OhGZNNedGzsRaicwIYZL6tKateRr1F040LTnI)**
 
 2. Run **QGIS**.
 
@@ -216,7 +240,8 @@ The user can configure:
 - tile width,
 - tile height,
 - tile overlap percentage,
-- output directory.
+- output directory,
+- color of padding.
 
 Instead of starting immediately, the **Preview & Start Tiling** button first displays a preview of the generated tile grid. The user can then confirm the operation to generate the tiles or cancel it before any files are written.
 
