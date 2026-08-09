@@ -3,7 +3,7 @@ name=YOLO-MOD
 qgisMinimumVersion=3.40
 qgisMaximumVersion=3.99
 description=Deep learning-based object detection in raster data using YOLO models within QGIS.
-version=2.1.0
+version=2.1.1
 author=Mateusz Strzelecki, Marcin Ciecholewski
 email=marcin.ciecholewski@pg.edu.pl
 
@@ -13,7 +13,7 @@ tracker=https://github.com/mateusz29/yolo-mod/issues
 repository=https://github.com/mateusz29/yolo-mod
 homepage=https://github.com/mateusz29/yolo-mod
 
-changelog=2.1.0 - Added custom Ultralytics YOLO models, layer merging, canvas tiling, object detection editing, and usability improvements.
+changelog=2.1.1 - Added support for custom Ultralytics YOLO models, layer merging, canvas tiling, object detection editing, usability improvements, and fixed the Bandit B311 false positive.
 
 tags=yolo, object detection, deep learning, remote sensing, raster, qgis, onnx, pytorch
 category=Raster
