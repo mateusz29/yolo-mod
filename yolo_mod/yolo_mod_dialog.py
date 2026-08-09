@@ -208,7 +208,7 @@ class YOLOModDialog(QtWidgets.QDialog, FORM_CLASS):
             if class_name in self.default_colors:
                 color = self.default_colors[class_name]
             else:
-                color = QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)).name()
+                color = QColor(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)).name() # nosec B311
                 
             outline_btn.setStyleSheet(f"background-color: {color}")
             fill_btn.setStyleSheet(f"background-color: {color}")
