@@ -20,7 +20,10 @@
 
 Version: **v2.1.1**
 
-Latest plugin package:  
+Official QGIS Plugin Repository:
+https://plugins.qgis.org/plugins/yolo_mod/version/2.1.1/
+
+Manual installation package:
 yolo_mod.zip
 
 Tested environment:
@@ -29,8 +32,8 @@ Tested environment:
 - QGIS 3.42 (Münster)
 - Windows 11
 - OSGeo4W distribution
-  
-Future releases and updates will be published through the GitHub repository.
+
+ Stable releases are distributed through the official QGIS Plugin Repository.
 
 ---
 
@@ -206,7 +209,13 @@ YOLOv11 detects a larger number of vessels, particularly in clustered regions, w
 ---
 ## Installation Overview
 
-The YOLO-MOD plugin is currently distributed as a ZIP package and can be installed in QGIS using the Install from ZIP option.
+YOLO-MOD v2.1.1 is officially available through the QGIS Plugin Repository:
+
+https://plugins.qgis.org/plugins/yolo_mod/
+
+The recommended installation method is directly through the QGIS Plugin Manager.
+
+A ZIP package is also provided in this GitHub repository for manual installation.
 
 ## ⚙️ Python Dependencies
 
@@ -222,16 +231,25 @@ Detailed installation instructions and tested dependency versions are provided b
 
 ## Plugin Installation
 
+### Recommended: QGIS Plugin Repository
+
+1. Run QGIS.
+2. Open **Plugins → Manage and Install Plugins**.
+3. Search for **YOLO-MOD**.
+4. Select the plugin and click **Install Plugin**.
+
+Official QGIS Plugin Repository:
+https://plugins.qgis.org/plugins/yolo_mod/
+
+### Manual installation from ZIP
+
+Alternatively, the plugin can be installed manually:
+
 1. Download the plugin ZIP: **[yolo_mod.zip](https://mega.nz/file/LRMgGKCC#ulA4-UGAKfiUBHDa3_4WURiWdcwIrU2lSVcIT13GS5c)**
-
-2. Run **QGIS**.
-
-3. Open: **Plugins → Manage and Install Plugins**
-
-4. Select: **Install from ZIP**
-
+2. Run QGIS.
+3. Open **Plugins → Manage and Install Plugins**.
+4. Select **Install from ZIP**.
 5. Choose the downloaded ZIP file.
-
 6. Click **Install Plugin**.
 
 ## Requirements
