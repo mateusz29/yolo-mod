@@ -449,7 +449,8 @@ https://youtu.be/W3K95WyYc28
 
 ## Citation
 
-If you use YOLO-MOD in your research, please cite the corresponding SoftwareX article:
+If you use YOLO-MOD in your research, please cite the original SoftwareX publication. If you use features introduced in version 2.1.1, please also
+cite the corresponding SoftwareX update article.
 
 ### Plain text citation
 
@@ -468,4 +469,13 @@ Ciecholewski, M., Strzelecki, M., & Farelnik, M. (2026). YOLO-MOD: YOLO-based mu
   publisher = {Elsevier},
   doi     = {10.1016/j.softx.2026.102721}
 }
-
+@article{Ciecholewski2026YOLOMODUpdate,
+  title     = {Version [2.1.1]-[YOLO-MOD: YOLO-based multi-category object detection plugin for maritime, aviation, and infrastructure objects in optical remote sensing images in QGIS]},
+  author    = {Ciecholewski, Marcin and Strzelecki, Mateusz},
+  journal   = {SoftwareX},
+  volume    = {35},
+  pages     = {103002},
+  year      = {2026},
+  publisher = {Elsevier},
+  doi       = {10.1016/j.softx.2026.103002}
+}
