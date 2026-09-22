@@ -456,7 +456,7 @@ cite the corresponding SoftwareX update article.
 
 Ciecholewski, M., Strzelecki, M., & Farelnik, M. (2026). YOLO-MOD: YOLO-based multi-category object detection plugin for maritime, aviation, and infrastructure objects in optical remote sensing images in QGIS. SoftwareX, 34, 102721. https://doi.org/10.1016/j.softx.2026.102721
 
-### BibTeX
+#### BibTeX
 
 ```bibtex
 @article{Ciecholewski2026YOLOMOD,
@@ -469,6 +469,14 @@ Ciecholewski, M., Strzelecki, M., & Farelnik, M. (2026). YOLO-MOD: YOLO-based mu
   publisher = {Elsevier},
   doi     = {10.1016/j.softx.2026.102721}
 }
+```
+### Plain text citation
+
+Ciecholewski, M., & Strzelecki, M. (2026). Version [2.1.1]-[YOLO-MOD: YOLO-based multi-category object detection plugin for maritime, aviation, and infrastructure objects in optical remote sensing images in QGIS]. SoftwareX, 35, 103002. https://doi.org/10.1016/j.softx.2026.103002
+
+#### BibTeX
+
+```bibtex
 @article{Ciecholewski2026YOLOMODUpdate,
   title     = {Version [2.1.1]-[YOLO-MOD: YOLO-based multi-category object detection plugin for maritime, aviation, and infrastructure objects in optical remote sensing images in QGIS]},
   author    = {Ciecholewski, Marcin and Strzelecki, Mateusz},
@@ -479,3 +487,4 @@ Ciecholewski, M., Strzelecki, M., & Farelnik, M. (2026). YOLO-MOD: YOLO-based mu
   publisher = {Elsevier},
   doi       = {10.1016/j.softx.2026.103002}
 }
+```
